@@ -22,7 +22,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <string>
 
 #include "swsexception.h"
-#include "atoms/baseoperations.h"
+
+// These includes can be removed from sws.h to make them optional
+    #include "atoms/baseoperations.h"
 
 namespace sws {
     const char pathDelimiter = '/';

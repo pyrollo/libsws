@@ -1,5 +1,5 @@
 /*
-Short Waves System - A numeric modular synthetizer
+Short Waves System Library - A numeric modular synthetizer
 Copyright (C) 2021 Pierre-Yves Rollo <dev@pyrollo.com>
 
 This program is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <stdexcept>
 
 #include "swsexception.h"
-#include "swsmodulefactory.h"
+
 
 swsContainer::swsContainer(): mScheduled(false)
 {
@@ -44,7 +44,6 @@ swsModule *swsContainer::newModule(std::string moduleName, std::string moduleTyp
     }
 
     swsModule *module = swsModuleFactory::produce(moduleType);
-    printf("New module : %s %s %p\n", moduleType.c_str(), moduleName.c_str(), module);
     mModules[moduleName] = module;
 
     expireSchedule();

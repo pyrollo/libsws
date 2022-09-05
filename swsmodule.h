@@ -1,5 +1,5 @@
 /*
-Short Waves System - A numeric modular synthetizer
+Short Waves System Library - A numeric modular synthetizer
 Copyright (C) 2021 Pierre-Yves Rollo <dev@pyrollo.com>
 
 This program is free software: you can redistribute it and/or modify
@@ -24,10 +24,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include "swsplug.h"
 #include "swsvalue.h"
+#include "swsfactory.h"
 
 class swsContainer;
 
-class swsModule
+typedef swsFactory<swsModule> swsModuleFactory;
+
+class swsModule: public swsModuleFactory
 {
 public:
     swsModule();

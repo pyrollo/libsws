@@ -1,14 +1,32 @@
+/*
+Short Waves System Library - A numeric modular synthetizer
+Copyright (C) 2021 Pierre-Yves Rollo <dev@pyrollo.com>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 #ifndef BASEOPERATIONS_H
 #define BASEOPERATIONS_H
 
 #include <swsmodule.h>
-#include <swsmodulefactory.h>
+#include <swsfactory.h>
 #include <swsvalue.h>
 
-class swsModuleValue : public swsModule
+class swsModuleValue: public swsModule::Registrar<swsModuleValue>
 {
 public:
-    swsModuleValue(): swsModule()
+    swsModuleValue()
     {
         newPlug("value", swsPlug::direction::output, 0);
     };
@@ -21,37 +39,33 @@ public:
     {};
 };
 
-class swsModuleAdd : public swsModule
+class swsModuleAdd : public swsModule::Registrar<swsModuleAdd>
 {
 public:
-    swsModuleAdd() /*: swsModule()
+    swsModuleAdd()
     {
         mResult = newPlug("result", swsPlug::direction::output, 0);
         mOp1 = newPlug("op1", swsPlug::direction::input, 0);
         mOp2 = newPlug("op2", swsPlug::direction::input, 0);
-    }*/;
+    };
 
     virtual ~swsModuleAdd() {}
 
-    static std::string getType() { /*printf("Type=%s\n", mRegistration.type.c_str());*/ return "add"; }
+    static std::string getType() { return "add"; }
 
-    void step() override/*
+    void step() override
     {
         mResult->setValue(mOp1->getValue() + mOp2->getValue());
-    }*/;
+    };
 
 private:
     swsPlug *mResult, *mOp1, *mOp2;
-
-    static swsModuleRegistration<swsModuleAdd> mRegistration;
 };
 
-//void *__swsModuleAddRegistration = (void *) &swsModuleAdd::mRegistration;
-
-class swsModuleMultiply : public swsModule
+class swsModuleMultiply : public swsModule::Registrar<swsModuleMultiply>
 {
 public:
-    swsModuleMultiply(): swsModule()
+    swsModuleMultiply()
     {
         mResult = newPlug("result", swsPlug::direction::output, 0);
         mOp1 = newPlug("op1", swsPlug::direction::input, 0);
@@ -70,9 +84,5 @@ public:
 private:
     swsPlug *mResult, *mOp1, *mOp2;
 };
-
-//static swsModuleRegistration<swsModuleAdd>      swsModuleAddRegistration;
-static swsModuleRegistration<swsModuleValue>    swsModuleValueAddRegistration;
-static swsModuleRegistration<swsModuleMultiply> swsModuleMultiplyRegistration;
 
 #endif // BASEOPERATIONS_H

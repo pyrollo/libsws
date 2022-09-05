@@ -1,5 +1,5 @@
 /*
-Short Waves System - A numeric modular synthetizer
+Short Waves System Library - A numeric modular synthetizer
 Copyright (C) 2021 Pierre-Yves Rollo <dev@pyrollo.com>
 
 This program is free software: you can redistribute it and/or modify
@@ -25,14 +25,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "swsmodule.h"
 #include "swscontainer.h"
 
-class swsContainerModule: public swsContainer, public swsModule
+class swsContainerModule: public swsContainer, public swsModule::Registrar<swsContainerModule>
 {
 public:
-    swsContainerModule(): swsModule(), swsContainer() {}
+    swsContainerModule(): swsContainer() {}
     virtual ~swsContainerModule() {}
     static std::string getType() { return "container"; }
 
-    void step() override {};
+    void step() override {}
     swsContainer* toContainer() override { return (swsContainer *) this; }
 
 };

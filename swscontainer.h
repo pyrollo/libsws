@@ -1,5 +1,5 @@
 /*
-Short Waves System - A numeric modular synthetizer
+Short Waves System Library - A numeric modular synthetizer
 Copyright (C) 2021 Pierre-Yves Rollo <dev@pyrollo.com>
 
 This program is free software: you can redistribute it and/or modify
