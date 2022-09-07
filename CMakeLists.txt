@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_library(sws STATIC
-  sws.h sws.cpp
+  swsengine.h swsengine.cpp
   swsvalue.h
   swsexception.h
   swsplug.h swsplug.cpp

@@ -20,13 +20,17 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #define SWS_H
 
 #include <string>
+#include <unordered_set>
 
 #include "swsexception.h"
+#include "swscontainermodule.h"
 
 // These includes can be removed from sws.h to make them optional
     #include "atoms/baseoperations.h"
 
-namespace sws {
+class swsEngine
+{
+public:
     const char pathDelimiter = '/';
 
     void newModule(std::string modulePath, std::string moduleType);
@@ -39,6 +43,16 @@ namespace sws {
     void connect(std::string sourcePlugPath, std::string targetPlugPath);
     void canConnect(std::string sourcePlugPath, std::string targetPlugPath);
     void listConnectable(std::string plugPath);
-}
+
+private:
+    swsContainerModule mRoot;
+
+    void checkName(std::string name);
+    std::vector<std::string> splitPath(std::string path);
+    std::string getBasePath(std::string path);
+    std::string getItemName(std::string path);
+    swsModule *getModule(std::string modulePath);
+    swsContainer *getContainer(std::string modulePath);
+};
 
 #endif // SWS_H

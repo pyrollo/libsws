@@ -38,7 +38,7 @@ public:
     std::unordered_set<std::string> listModules();
     swsModule *getModule(std::string moduleName);
 
-    void expireSchedule() { mScheduled = false; };
+    void expireSchedule() { mScheduled = false; }
     void step();
 
     swsContainer* toContainer() { return this; }
