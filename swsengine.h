@@ -32,6 +32,7 @@ class swsEngine
 {
 public:
     const char pathDelimiter = '/';
+    const char attributeDelimiter = '#';
 
     void newModule(std::string modulePath, std::string moduleType);
     void copyModule(std::string sourcePath, std::string targetPath);
@@ -45,14 +46,15 @@ public:
     void listConnectable(std::string plugPath);
 
 private:
-    swsContainerModule mRoot;
+    swsSchema mRootSchema;
 
     void checkName(std::string name);
     std::vector<std::string> splitPath(std::string path);
     std::string getBasePath(std::string path);
     std::string getItemName(std::string path);
+    std::string getItemAttributeName(std::string path);
     swsModule *getModule(std::string modulePath);
-    swsContainer *getContainer(std::string modulePath);
+    swsSchema *getSchema(std::string schemaPath);
 };
 
 #endif // SWS_H

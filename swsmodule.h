@@ -26,7 +26,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "swsvalue.h"
 #include "swsfactory.h"
 
-class swsContainer;
+class swsSchema;
 
 typedef swsFactory<swsModule> swsModuleFactory;
 
@@ -37,7 +37,7 @@ public:
     virtual ~swsModule();
 
     virtual void step() = 0;
-    static std::string getType() { return "unknown"; };
+    static std::string getType() { return "unknown"; }
     virtual bool isInterconnected() { return true; }
 
     swsPlug *newPlug(std::string name, swsPlug::direction direction, swsValue value);
@@ -47,9 +47,11 @@ public:
     swsPlug *plug(std::string plugName) const;
     std::unordered_set<swsPlug *> plugs();
 
-    virtual swsContainer* toContainer() { return nullptr; }
+    virtual swsSchema* toSchema() { return nullptr; }
+
 protected:
     std::map<std::string, swsPlug *> mPlugs;
+    swsSchema *mSchema;
 };
 
 #endif // SWSMODULE_H

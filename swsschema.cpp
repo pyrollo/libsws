@@ -16,73 +16,53 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "swscontainer.h"
+#include "swsschema.h"
 
 #include <stdexcept>
 
 #include "swsexception.h"
 
 
-swsContainer::swsContainer(): mScheduled(false)
+swsSchema::swsSchema(): mScheduled(false)
 {
 }
 
-swsContainer::~swsContainer()
+swsSchema::~swsSchema()
 {
     for (auto it: mModules)
         delete it.second;
 }
 
-swsModule *swsContainer::newModule(std::string moduleName, std::string moduleType)
+swsModule *swsSchema::newModule(std::string moduleName, std::string moduleType)
 {
     // TODO: mutex preventing step
 
     try {
         mModules.at(moduleName);
         throw sws::duplicate_name();
-    } catch(const std::out_of_range&) {
-    }
+    } catch(const std::out_of_range&) {}
 
     swsModule *module = swsModuleFactory::produce(moduleType);
     mModules[moduleName] = module;
-
     expireSchedule();
+
+    swsSchema *schema = module->toSchema();
+    if (schema)
+        mSchemas[moduleName] = schema;
+
     return module;
-};
-
-bool swsContainer::isAncestorOf(swsContainer *container)
-{
-    for (auto it: mModules)
-    {
-        if (it.second->toContainer() == this)
-            return true;
-
-        swsContainer *child = it.second->toContainer();
-        if (child && child->isAncestorOf(this))
-            return true;
-    }
-    return false;
 }
 
-swsModule *swsContainer::instanciateModule(std::string moduleName, swsContainer *container)
+swsSchema *swsSchema::getSchema(std::string schemaName)
 {
-    if (!container->isAncestorOf(this))
-        throw sws::loop_in_instanciations();
-
-    return nullptr;
-}
-/*
-// No checks, could create infinite loop
-swsModule *swsContainer::copyTo(swsContainer *destination)
-{
-    for (auto it: mModules)
-    {
-        destination->newModule(it.first, it.second->getType());
-
+    try {
+        return mSchemas.at(schemaName);
+    } catch(const std::out_of_range&) {
+        throw sws::unknown_schema(schemaName);
     }
 }
-*/
-swsModule *swsContainer::getModule(std::string moduleName)
+
+swsModule *swsSchema::getModule(std::string moduleName)
 {
     try {
         return mModules.at(moduleName);
@@ -91,7 +71,7 @@ swsModule *swsContainer::getModule(std::string moduleName)
     }
 }
 
-void swsContainer::deleteModule(std::string moduleName)
+void swsSchema::deleteModule(std::string moduleName)
 {
     // TODO: mutex preventing step
 
@@ -102,19 +82,9 @@ void swsContainer::deleteModule(std::string moduleName)
     delete it->second;
     mModules.erase(it);
     expireSchedule();
-};
-
-std::unordered_set<std::string> swsContainer::listModules()
-{
-    std::unordered_set<std::string> children;
-
-    for (auto it: mModules)
-        children.insert(it.first);
-
-    return children;
 }
 
-bool swsContainer::isQueuable(swsModule *module, std::unordered_set<swsModule *> &unscheduledModules)
+bool swsSchema::isQueuable(swsModule *module, std::unordered_set<swsModule *> &unscheduledModules)
 {
     // Check that all upstream modules are queued
     if (module->isInterconnected())
@@ -125,7 +95,7 @@ bool swsContainer::isQueuable(swsModule *module, std::unordered_set<swsModule *>
     return true;
 }
 
-void swsContainer::schedule()
+void swsSchema::schedule()
 {
     std::unordered_set<swsModule *> unscheduledModules;
 
@@ -154,7 +124,7 @@ void swsContainer::schedule()
     mScheduled = true;
 }
 
-void swsContainer::step()
+void swsSchema::step()
 {
     //const std::lock_guard<std::mutex> lock(mStepMutex);
 

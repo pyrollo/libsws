@@ -23,17 +23,17 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <vector>
 
 #include "swsmodule.h"
-#include "swscontainer.h"
+#include "swsschema.h"
 
-class swsContainerModule: public swsContainer, public swsModule::Registrar<swsContainerModule>
+class swsContainerModule: public swsSchema, public swsModule::Registrar<swsContainerModule>
 {
 public:
-    swsContainerModule(): swsContainer() {}
+    swsContainerModule(): swsSchema() {}
     virtual ~swsContainerModule() {}
     static std::string getType() { return "container"; }
 
     void step() override {}
-    swsContainer* toContainer() override { return (swsContainer *) this; }
+    swsSchema* toSchema() override { return this; }
 
 };
 

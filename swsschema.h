@@ -16,8 +16,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef SWSCONTAINER_H
-#define SWSCONTAINER_H
+#ifndef SWSSCHEMA_H
+#define SWSSCHEMA_H
 
 #include <unordered_map>
 #include <unordered_set>
@@ -25,25 +25,24 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include "swsmodule.h"
 
-class swsContainer
+class swsSchema
 {
 public:
-    swsContainer();
-    virtual ~swsContainer();
+    swsSchema();
+    virtual ~swsSchema();
 
-    swsModule *newModule(std::string moduleName, std::string moduleType);
-    swsModule *instanciateModule(std::string moduleName, swsContainer *container);
-    void deleteModule(std::string moduleName);
+    swsSchema *getSchema(std::string schemaName);
 
-    std::unordered_set<std::string> listModules();
     swsModule *getModule(std::string moduleName);
+    swsModule *newModule(std::string moduleName, std::string moduleType);
+    void deleteModule(std::string moduleName);
 
     void expireSchedule() { mScheduled = false; }
     void step();
 
-    swsContainer* toContainer() { return this; }
-
 protected:
+    std::unordered_map<std::string, swsSchema *> mSchemas;
+
     std::unordered_map<std::string, swsModule *> mModules;
     std::vector<swsModule *> mScheduledModules;
     bool mScheduled;
@@ -51,7 +50,7 @@ protected:
     bool isQueuable(swsModule *module, std::unordered_set<swsModule *> &unscheduledModules);
     void schedule();
 
-    bool isAncestorOf(swsContainer *container);
+    bool isAncestorOf(swsSchema *schema);
 };
 
-#endif // SWSCONTAINER_H
+#endif // SWSSCHEMA_H

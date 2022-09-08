@@ -13,7 +13,7 @@ add_library(sws STATIC
   swsplug.h swsplug.cpp
   swsmodule.h swsmodule.cpp
   swsfactory.h
-  swscontainer.h swscontainer.cpp
+  swsschema.h swsschema.cpp
   swscontainermodule.h swscontainermodule.cpp
   atoms/baseoperations.h atoms/baseoperations.cpp
 )

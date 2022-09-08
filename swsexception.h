@@ -37,6 +37,12 @@ namespace sws {
         unknown_module(std::string objectName): unknown_object("module", objectName) {}
     };
 
+    class unknown_schema: public unknown_object
+    {
+    public:
+        unknown_schema(std::string objectName): unknown_object("schema", objectName) {}
+    };
+
     class illegal_connection: public exception
     {
     public:
@@ -85,6 +91,7 @@ namespace sws {
         unknown_type(std::string typeName):
             exception("Unkown type \"" + typeName + "\"") {}
     };
+
 }
 
 #endif // SWSEXCEPTIONS_H

@@ -42,13 +42,14 @@ public:
     direction getDirection() const { return mDirection; }
     swsModule *getModule() const { return mModule; }
 
-    void connectTo(swsPlug *plug);
-    void connectFrom(swsPlug *plug);
-
     swsPlug *connectedFrom() { return mConnectedFrom; }
 
     swsValue getValue();
     void setValue(swsValue value) { mValue = value; }
+
+    bool acceptConnection(swsPlug *plug);
+    void connect(swsPlug *plug);
+    void disconnect(swsPlug *plug = nullptr);
 
 private:
     swsModule *mModule;
@@ -56,6 +57,8 @@ private:
     swsValue mValue; // TODO: Type of value could be chosen
     std::unordered_set <swsPlug *> mConnectedTo;
     swsPlug *mConnectedFrom;
+
+    void testConnection(swsPlug *plug);
 };
 
 #endif // SWSPLUG_H

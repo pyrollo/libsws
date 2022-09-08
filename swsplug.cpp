@@ -24,29 +24,87 @@ swsPlug::~swsPlug()
     // Disconnect
 }
 
-void swsPlug::connectTo(swsPlug *plug) {
-    if (mDirection != direction::output)
-        throw sws::illegal_connection();
-
-    if (mConnectedTo.find(plug) != mConnectedTo.end())
-        throw sws::already_connected();
-
-    mConnectedTo.insert(plug);
-}
-
-void swsPlug::connectFrom(swsPlug *plug) {
-    if (mDirection != direction::input)
-        throw sws::illegal_connection();
-
-    if (mConnectedFrom)
-        throw sws::already_connected();
-
-    mConnectedFrom = plug;
-}
-
 swsValue swsPlug::getValue() {
     if (mConnectedFrom)
         return mConnectedFrom->mValue;
     else
         return mValue;
+}
+
+void swsPlug::testConnection(swsPlug *plug)
+{
+    switch (mDirection) {
+    case direction::output:
+        if (plug->getDirection() != direction::input)
+            throw sws::illegal_connection();
+        if (mConnectedTo.find(plug) != mConnectedTo.end())
+            throw sws::already_connected();
+        break;
+    case direction::input:
+        if (plug->getDirection() != direction::output)
+            throw sws::illegal_connection();
+        if (mConnectedFrom)
+            throw sws::already_connected();
+        break;
+    default:
+        throw sws::illegal_connection();
+        break;
+    }
+}
+
+bool swsPlug::acceptConnection(swsPlug *plug)
+{
+    try {
+        testConnection(plug);
+        plug->testConnection(this);
+    } catch (sws::already_connected) {
+        return false;
+    } catch (sws::illegal_connection) {
+        return false;
+    }
+    return true;
+}
+
+void swsPlug::connect(swsPlug *plug)
+{
+    if (!plug)
+        return;
+
+    testConnection(plug);
+    plug->testConnection(this);
+
+    switch (mDirection) {
+    case direction::output:
+        mConnectedTo.insert(plug);
+        plug->mConnectedFrom = plug;
+    case direction::input:
+        mConnectedFrom = plug;
+        plug->mConnectedTo.insert(this);
+    default:
+        break;
+    }
+}
+
+void swsPlug::disconnect(swsPlug *plug)
+{
+    switch (mDirection) {
+    case direction::output:
+        if (!plug) {
+            // Disconnect all
+            for (auto plug: mConnectedTo)
+                plug->disconnect(this);
+            mConnectedTo.empty();
+        }
+        if (plug->mConnectedFrom == this) {
+            plug->disconnect(this);
+            mConnectedTo.erase(plug);
+        }
+        break;
+    case direction::input:
+        if (!plug || mConnectedFrom == plug)
+            mConnectedFrom->disconnect(this);
+        break;
+    default:
+        break;
+    }
 }
