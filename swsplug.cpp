@@ -18,10 +18,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include "swsplug.h"
 #include "swsexception.h"
+#include "swsmodule.h"
 
 swsPlug::~swsPlug()
 {
-    // Disconnect
+    disconnect();
 }
 
 swsValue swsPlug::getValue() {
@@ -31,21 +32,55 @@ swsValue swsPlug::getValue() {
         return mValue;
 }
 
+bool swsPlug::isUpstream(swsPlug *plug)
+{
+    if (plug == this)
+        return true;
+
+    if  (mDirection == direction::input) {
+        if (!mConnectedFrom)
+            return false;
+
+        return mConnectedFrom->isUpstream(plug);
+    }
+
+    if (!mModule->isInterconnected())
+        return false;
+
+    if  (mDirection == direction::output) {
+        for (auto it: mModule->plugs())
+            if (it.second->mDirection == direction::input)
+                if (it.second->isUpstream(plug))
+                    return true;
+    }
+
+    return mDirection == direction::none;
+}
+
 void swsPlug::testConnection(swsPlug *plug)
 {
+    if (mModule->getSchema() != plug->mModule->getSchema())
+        throw sws::illegal_connection();
+
     switch (mDirection) {
     case direction::output:
         if (plug->getDirection() != direction::input)
             throw sws::illegal_connection();
         if (mConnectedTo.find(plug) != mConnectedTo.end())
             throw sws::already_connected();
+        if (isUpstream(plug))
+            throw sws::illegal_connection();
         break;
+
     case direction::input:
         if (plug->getDirection() != direction::output)
             throw sws::illegal_connection();
         if (mConnectedFrom)
             throw sws::already_connected();
+        if (plug->isUpstream(this))
+            throw sws::illegal_connection();
         break;
+
     default:
         throw sws::illegal_connection();
         break;
@@ -56,7 +91,6 @@ bool swsPlug::acceptConnection(swsPlug *plug)
 {
     try {
         testConnection(plug);
-        plug->testConnection(this);
     } catch (sws::already_connected) {
         return false;
     } catch (sws::illegal_connection) {
@@ -71,15 +105,16 @@ void swsPlug::connect(swsPlug *plug)
         return;
 
     testConnection(plug);
-    plug->testConnection(this);
 
     switch (mDirection) {
     case direction::output:
         mConnectedTo.insert(plug);
-        plug->mConnectedFrom = plug;
+        plug->mConnectedFrom = this;
+        break;
     case direction::input:
         mConnectedFrom = plug;
         plug->mConnectedTo.insert(this);
+        break;
     default:
         break;
     }
@@ -92,19 +127,21 @@ void swsPlug::disconnect(swsPlug *plug)
         if (!plug) {
             // Disconnect all
             for (auto plug: mConnectedTo)
-                plug->disconnect(this);
+                plug->mConnectedFrom = nullptr;
             mConnectedTo.empty();
+            return;
         }
         if (plug->mConnectedFrom == this) {
-            plug->disconnect(this);
+            plug->mConnectedFrom = nullptr;
             mConnectedTo.erase(plug);
         }
         break;
     case direction::input:
-        if (!plug || mConnectedFrom == plug)
+        if (mConnectedFrom && (!plug || mConnectedFrom == plug))
             mConnectedFrom->disconnect(this);
         break;
     default:
         break;
     }
 }
+

@@ -59,6 +59,7 @@ private:
     swsPlug *mConnectedFrom;
 
     void testConnection(swsPlug *plug);
+    bool isUpstream(swsPlug *plug);
 };
 
 #endif // SWSPLUG_H

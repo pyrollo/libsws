@@ -42,8 +42,8 @@ public:
     void deletePlug(std::string plugPath);
 
     void connect(std::string sourcePlugPath, std::string targetPlugPath);
-    void canConnect(std::string sourcePlugPath, std::string targetPlugPath);
-    void listConnectable(std::string plugPath);
+    bool canConnect(std::string sourcePlugPath, std::string targetPlugPath);
+    std::unordered_set<std::string> listConnectable(std::string plugPath);
 
     void set(std::string plugPath, swsValue value);
     swsValue get(std::string plugPath);
@@ -58,8 +58,9 @@ private:
     std::string getBasePath(std::string path);
     std::string getItemName(std::string path);
     std::string getItemAttributeName(std::string path);
-    swsModule *getModule(std::string modulePath);
     swsSchema *getSchema(std::string schemaPath);
+    swsModule *getModule(std::string modulePath);
+    swsPlug   *getPlug(std::string plugPath);
 };
 
 #endif // SWS_H

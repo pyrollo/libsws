@@ -82,11 +82,6 @@ std::string swsEngine::getItemAttributeName(std::string path)
         return name.substr(pos+1);
 }
 
-swsModule *swsEngine::getModule(std::string modulePath)
-{
-    return getSchema(getBasePath(modulePath))->getModule(getItemName(modulePath));
-}
-
 swsSchema *swsEngine::getSchema(std::string schemaPath)
 {
     swsSchema *schema = &mRootSchema;
@@ -100,6 +95,20 @@ swsSchema *swsEngine::getSchema(std::string schemaPath)
     }
     return schema;
 }
+
+swsModule *swsEngine::getModule(std::string modulePath)
+{
+    return getSchema(getBasePath(modulePath))->getModule(getItemName(modulePath));
+}
+
+swsPlug *swsEngine::getPlug(std::string plugPath)
+{
+    swsPlug *plug = getModule(plugPath)->plug(getItemAttributeName(plugPath));
+    if (!plug)
+        throw sws::unknown_plug(plugPath);
+    return plug;
+}
+
 
 void swsEngine::newModule(std::string modulePath, std::string moduleType)
 {
@@ -117,26 +126,28 @@ void swsEngine::deleteModule(std::string modulePath)
 //void swsEngine::deletePlug(std::string plugPath);
 // --> est-ce que cela ne devrait pas être fait par la création de sous-modules spécifiques?
 
-void swsEngine::connect(std::string sourcePlugPath, std::string targetPlugPath)
+void swsEngine::connect(std::string plugPath1, std::string plugPath2)
 {
-    swsModule *sourceModule = getModule(sourcePlugPath);
-    swsModule *targetModule = getModule(targetPlugPath);
-
-    swsPlug *sourcePlug = sourceModule->plug(getItemAttributeName(sourcePlugPath));
-    if (!sourcePlug)
-        throw sws::unknown_plug(sourcePlugPath);
-
-    swsPlug *targetPlug = targetModule->plug(getItemAttributeName(targetPlugPath));
-    if (!targetPlug)
-        throw sws::unknown_plug(targetPlugPath);
-
-    if (sourcePlug->getDirection() != swsPlug::direction::input ||
-        targetPlug->getDirection() != swsPlug::direction::output)
-        throw sws::illegal_connection();
+    swsPlug *plug1 = getPlug(plugPath1);
+    swsPlug *plug2 = getPlug(plugPath2);
+    plug1->connect(plug2);
 }
 
-//void swsEngine::canConnect(std::string sourcePlugPath, std::string targetPlugPath);
-//void swsEngine::listConnectable(std::string plugPath);
+bool swsEngine::canConnect(std::string plugPath1, std::string plugPath2)
+{
+    swsPlug *plug1 = getPlug(plugPath1);
+    swsPlug *plug2 = getPlug(plugPath2);
+    return plug1->acceptConnection(plug2);
+}
+
+std::unordered_set<std::string> swsEngine::listConnectable(std::string plugPath)
+{
+    // TODO
+    std::unordered_set<std::string> list;
+    std::string schemaPath = getBasePath(plugPath);
+    swsPlug *plug = getPlug(plugPath);
+}
+
 
 void swsEngine::set(std::string plugPath, swsValue value)
 {

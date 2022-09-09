@@ -26,28 +26,28 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 class swsModuleValue: public swsModule::Registrar<swsModuleValue>
 {
 public:
-    swsModuleValue()
+    swsModuleValue(swsSchema *schema): swsModule::Registrar<swsModuleValue>(schema)
     {
         newPlug("value", swsPlug::direction::output, 0);
-    };
+    }
 
     virtual ~swsModuleValue() {}
 
     static std::string getType() { return "value"; }
 
     void step() override
-    {};
+    {}
 };
 
 class swsModuleAdd : public swsModule::Registrar<swsModuleAdd>
 {
 public:
-    swsModuleAdd()
+    swsModuleAdd(swsSchema *schema): swsModule::Registrar<swsModuleAdd>(schema)
     {
         mResult = newPlug("result", swsPlug::direction::output, 0);
         mOp1 = newPlug("op1", swsPlug::direction::input, 0);
         mOp2 = newPlug("op2", swsPlug::direction::input, 0);
-    };
+    }
 
     virtual ~swsModuleAdd() {}
 
@@ -56,7 +56,7 @@ public:
     void step() override
     {
         mResult->setValue(mOp1->getValue() + mOp2->getValue());
-    };
+    }
 
 private:
     swsPlug *mResult, *mOp1, *mOp2;
@@ -65,12 +65,12 @@ private:
 class swsModuleMultiply : public swsModule::Registrar<swsModuleMultiply>
 {
 public:
-    swsModuleMultiply()
+    swsModuleMultiply(swsSchema *schema): swsModule::Registrar<swsModuleMultiply>(schema)
     {
         mResult = newPlug("result", swsPlug::direction::output, 0);
         mOp1 = newPlug("op1", swsPlug::direction::input, 0);
         mOp2 = newPlug("op2", swsPlug::direction::input, 0);
-    };
+    }
 
     virtual ~swsModuleMultiply() {}
 
@@ -79,7 +79,7 @@ public:
     void step() override
     {
         mResult->setValue(mOp1->getValue() * mOp2->getValue());
-    };
+    }
 
 private:
     swsPlug *mResult, *mOp1, *mOp2;

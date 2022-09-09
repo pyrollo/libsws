@@ -33,19 +33,21 @@ typedef swsFactory<swsModule> swsModuleFactory;
 class swsModule: public swsModuleFactory
 {
 public:
-    swsModule();
+    swsModule(swsSchema *schema);
     virtual ~swsModule();
 
     virtual void step() = 0;
     static std::string getType() { return "unknown"; }
     virtual bool isInterconnected() { return true; }
 
+    swsSchema *getSchema() { return mSchema; }
+
     swsPlug *newPlug(std::string name, swsPlug::direction direction, swsValue value);
     void deletePlug(std::string name);
     std::unordered_set<std::string> listPlugs();
 
     swsPlug *plug(std::string plugName) const;
-    std::unordered_set<swsPlug *> plugs();
+    std::map<std::string, swsPlug *> const plugs() { return mPlugs; }
 
     virtual swsSchema* toSchema() { return nullptr; }
 

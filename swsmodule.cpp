@@ -21,7 +21,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <stdexcept>
 
-swsModule::swsModule()
+swsModule::swsModule(swsSchema *schema): mSchema(schema)
 {
 }
 
@@ -65,16 +65,6 @@ std::unordered_set<std::string> swsModule::listPlugs()
 
     for (auto it: mPlugs)
         plugs.insert(it.first);
-
-    return plugs;
-}
-
-std::unordered_set<swsPlug *> swsModule::plugs()
-{
-    std::unordered_set<swsPlug *> plugs;
-
-    for (auto it: mPlugs)
-        plugs.insert(it.second);
 
     return plugs;
 }

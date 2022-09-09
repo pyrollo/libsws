@@ -42,7 +42,7 @@ swsModule *swsSchema::newModule(std::string moduleName, std::string moduleType)
         throw sws::duplicate_name();
     } catch(const std::out_of_range&) {}
 
-    swsModule *module = swsModuleFactory::produce(moduleType);
+    swsModule *module = swsModuleFactory::produce(this, moduleType);
     mModules[moduleName] = module;
     expireSchedule();
 
@@ -89,7 +89,7 @@ bool swsSchema::isQueuable(swsModule *module, std::unordered_set<swsModule *> &u
     // Check that all upstream modules are queued
     if (module->isInterconnected())
         for (auto it: module->plugs())
-            if (it->connectedFrom() && unscheduledModules.find(it->connectedFrom()->getModule()) != unscheduledModules.end())
+            if (it.second->connectedFrom() && unscheduledModules.find(it.second->connectedFrom()->getModule()) != unscheduledModules.end())
                 return false;
 
     return true;

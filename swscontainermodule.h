@@ -28,7 +28,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 class swsContainerModule: public swsSchema, public swsModule::Registrar<swsContainerModule>
 {
 public:
-    swsContainerModule(): swsSchema() {}
+    swsContainerModule(swsSchema *schema): swsSchema(), swsModule::Registrar<swsContainerModule>(schema) {}
     virtual ~swsContainerModule() {}
     static std::string getType() { return "container"; }
 

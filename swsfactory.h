@@ -8,16 +8,18 @@
 
 // Inspired from http://www.nirfriedman.com/2018/04/29/unforgettable-factory/
 
+class swsSchema;
+
 template <class Base>
 class swsFactory
 {
 public:
-    static Base *produce(const std::string &typeName)
+    static Base *produce(swsSchema *schema, const std::string &typeName)
     {
         auto it = instanciators().find(typeName);
         if  (it == instanciators().end())
             throw sws::unknown_type(typeName);
-        return it->second();
+        return it->second(schema);
     }
 
     template<typename T>
@@ -30,19 +32,19 @@ public:
             if (it != instanciators().end())
                 throw sws::duplicate_name();
 
-            swsFactory::instanciators()[typeName] = []() -> Base* { return new T(); };
+            swsFactory::instanciators()[typeName] = [](swsSchema *schema) -> Base* { return new T(schema); };
             return true;
         };
         static bool registered;
 
     private:
-        Registrar() { (void)registered; }
+        Registrar(swsSchema *schema) : swsModule(schema) { (void)registered; }
     };
 
     friend Base;
 
 private:
-    using FuncType = Base *(*)();
+    using FuncType = Base *(*)(swsSchema *);
     swsFactory() = default;
 
     static std::unordered_map<std::string, FuncType> &instanciators() {
