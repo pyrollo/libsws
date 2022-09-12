@@ -45,6 +45,11 @@ public:
     void canConnect(std::string sourcePlugPath, std::string targetPlugPath);
     void listConnectable(std::string plugPath);
 
+    void set(std::string plugPath, swsValue value);
+    swsValue get(std::string plugPath);
+
+    void step();
+
 private:
     swsSchema mRootSchema;
 

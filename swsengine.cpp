@@ -138,3 +138,17 @@ void swsEngine::connect(std::string sourcePlugPath, std::string targetPlugPath)
 //void swsEngine::canConnect(std::string sourcePlugPath, std::string targetPlugPath);
 //void swsEngine::listConnectable(std::string plugPath);
 
+void swsEngine::set(std::string plugPath, swsValue value)
+{
+    getPlug(plugPath)->setValue(value);
+}
+
+swsValue swsEngine::get(std::string plugPath)
+{
+    return getPlug(plugPath)->getValue();
+}
+
+void swsEngine::step()
+{
+    mRootSchema.step();
+}
