@@ -41,13 +41,23 @@ swsPlug *swsModule::newPlug(std::string name, swsPlug::direction direction, swsV
     return plug;
 }
 
-void swsModule::deletePlug(std::string name)
+void swsModule::deletePlug(swsPlug *plug)
 {
-    if (mPlugs.find(name) == mPlugs.end())
-        throw sws::unknown_plug(name);
+    if (plug->getModule() == this) {
+        for (auto it = mPlugs.begin(); it != mPlugs.end(); ++it)
+            if (it->second == plug) {
+                delete it->second;
+                mPlugs.erase(it);
+                return;
+            }
 
-    delete mPlugs[name];
-    mPlugs.erase(name);
+        throw sws::unknown_plug("(anonymous)");
+    }
+}
+
+void swsModule::deleteAnyPlug(swsPlug *plug)
+{
+    plug->getModule()->deletePlug(plug);
 }
 
 swsPlug *swsModule::plug(std::string name) const

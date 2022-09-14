@@ -18,5 +18,58 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include "swscontainermodule.h"
 
-// Adding certain modules could automatically create corresponding plugs
-// So we have 3 specific modules : input, output and internal value (plug neither in or out), corresponding to module plugs
+swsModule *swsContainerModule::newModule(std::string moduleName, std::string moduleType)
+{
+    swsModule *module = swsSchema::newModule(moduleName, moduleType);
+
+    if (moduleType == "input")
+    {
+        ((swsInputModule *)module)->mExtern = newPlug(moduleName, swsPlug::direction::input, 0);
+    }
+
+    if (moduleType == "output")
+    {
+        ((swsOutputModule *)module)->mExtern = newPlug(moduleName, swsPlug::direction::output, 0);
+    }
+
+    return module;
+}
+
+void swsContainerModule::step()
+{
+    swsSchema::step();
+}
+
+swsInputModule::swsInputModule(swsSchema *schema): swsModule::Registrar<swsInputModule>(schema), mExtern(nullptr)
+{
+    mValue = newPlug("value", swsPlug::direction::output, 0);
+}
+
+swsInputModule::~swsInputModule()
+{
+    if (mExtern)
+        deleteAnyPlug(mExtern);
+}
+
+void swsInputModule::step()
+{
+    if (mExtern)
+        mValue->setValue(mExtern->getValue());
+}
+
+swsOutputModule::swsOutputModule(swsSchema *schema): swsModule::Registrar<swsOutputModule>(schema), mExtern(nullptr)
+{
+    mValue = newPlug("value", swsPlug::direction::input, 0);
+}
+
+swsOutputModule::~swsOutputModule()
+{
+    if (mExtern)
+        deleteAnyPlug(mExtern);
+}
+
+void swsOutputModule::step()
+{
+    if (mExtern)
+        mExtern->setValue(mValue->getValue());
+}

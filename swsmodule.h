@@ -27,6 +27,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "swsfactory.h"
 
 class swsSchema;
+class swsInputModule;
 
 typedef swsFactory<swsModule> swsModuleFactory;
 
@@ -42,8 +43,6 @@ public:
 
     swsSchema *getSchema() { return mSchema; }
 
-    swsPlug *newPlug(std::string name, swsPlug::direction direction, swsValue value);
-    void deletePlug(std::string name);
     std::unordered_set<std::string> listPlugs();
 
     swsPlug *plug(std::string plugName) const;
@@ -54,6 +53,11 @@ public:
 protected:
     std::map<std::string, swsPlug *> mPlugs;
     swsSchema *mSchema;
+
+    swsPlug *newPlug(std::string name, swsPlug::direction direction, swsValue value);
+    void deletePlug(swsPlug *plug);
+    static void deleteAnyPlug(swsPlug *plug);
 };
+
 
 #endif // SWSMODULE_H

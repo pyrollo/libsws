@@ -25,16 +25,51 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "swsmodule.h"
 #include "swsschema.h"
 
-class swsContainerModule: public swsSchema, public swsModule::Registrar<swsContainerModule>
+class swsContainerModule: public swsModule::Registrar<swsContainerModule>, public swsSchema
 {
 public:
-    swsContainerModule(swsSchema *schema): swsSchema(), swsModule::Registrar<swsContainerModule>(schema) {}
+    swsContainerModule(swsSchema *schema): swsModule::Registrar<swsContainerModule>(schema), swsSchema() {}
     virtual ~swsContainerModule() {}
+
     static std::string getType() { return "container"; }
 
-    void step() override {}
+    void step() override;
+
     swsSchema* toSchema() override { return this; }
 
+    swsModule *newModule(std::string moduleName, std::string moduleType) override;
+};
+
+class swsInputModule: public swsModule::Registrar<swsInputModule>
+{
+    friend class swsContainerModule;
+
+public:
+    swsInputModule(swsSchema *schema);
+    ~swsInputModule() override;
+
+    static std::string getType() { return "input"; }
+
+    void step() override;
+
+private:
+    swsPlug *mValue, *mExtern;
+};
+
+class swsOutputModule: public swsModule::Registrar<swsOutputModule>
+{
+    friend class swsContainerModule;
+
+public:
+    swsOutputModule(swsSchema *schema);
+    virtual ~swsOutputModule();
+
+    static std::string getType() { return "output"; }
+
+    void step() override;
+
+private:
+    swsPlug *mValue, *mExtern;
 };
 
 #endif // SWSCONTAINERMODULE_H

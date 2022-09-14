@@ -34,7 +34,7 @@ public:
     swsSchema *getSchema(std::string schemaName);
 
     swsModule *getModule(std::string moduleName);
-    swsModule *newModule(std::string moduleName, std::string moduleType);
+    virtual swsModule *newModule(std::string moduleName, std::string moduleType);
     void deleteModule(std::string moduleName);
 
     void expireSchedule() { mScheduled = false; }

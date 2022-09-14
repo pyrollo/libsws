@@ -122,10 +122,6 @@ void swsEngine::deleteModule(std::string modulePath)
     getSchema(getBasePath(modulePath))->deleteModule(getItemName(modulePath));
 }
 
-//void swsEngine::newPlug(std::string plugPath, std::string plugType);
-//void swsEngine::deletePlug(std::string plugPath);
-// --> est-ce que cela ne devrait pas être fait par la création de sous-modules spécifiques?
-
 void swsEngine::connect(std::string plugPath1, std::string plugPath2)
 {
     swsPlug *plug1 = getPlug(plugPath1);

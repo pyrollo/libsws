@@ -34,7 +34,7 @@ public:
 
             swsFactory::instanciators()[typeName] = [](swsSchema *schema) -> Base* { return new T(schema); };
             return true;
-        };
+        }
         static bool registered;
 
     private:
