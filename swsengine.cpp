@@ -144,6 +144,13 @@ std::unordered_set<std::string> swsEngine::listConnectable(std::string plugPath)
     swsPlug *plug = getPlug(plugPath);
 }
 
+void swsEngine::disconnect(std::string plugPath1, std::string plugPath2)
+{
+    swsPlug *plug1 = getPlug(plugPath1);
+    swsPlug *plug2 = getPlug(plugPath2);
+    plug1->disconnect(plug2);
+}
+
 
 void swsEngine::set(std::string plugPath, swsValue value)
 {

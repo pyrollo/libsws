@@ -41,9 +41,10 @@ public:
     void newPlug(std::string plugPath, std::string plugType);
     void deletePlug(std::string plugPath);
 
-    void connect(std::string sourcePlugPath, std::string targetPlugPath);
-    bool canConnect(std::string sourcePlugPath, std::string targetPlugPath);
+    void connect(std::string plugPath1, std::string plugPath2);
+    bool canConnect(std::string plugPath1, std::string plugPath2);
     std::unordered_set<std::string> listConnectable(std::string plugPath);
+    void disconnect(std::string plugPath1, std::string plugPath2);
 
     void set(std::string plugPath, swsValue value);
     swsValue get(std::string plugPath);
