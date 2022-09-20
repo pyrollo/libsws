@@ -110,6 +110,50 @@ swsPlug *swsEngine::getPlug(std::string plugPath)
 }
 
 
+std::string swsEngine::pathConcat(std::string first, std::string last)
+{
+    if (last.empty())
+        return first;
+
+    if (first.empty())
+        return last;
+
+    return first + pathDelimiter + last;
+}
+
+std::string swsEngine::getPath(swsSchema *schema)
+{
+    if (schema == &mRootSchema)
+        return "";
+
+    if (!schema->parent())
+        throw sws::internal_error("Non root schema with no parent");
+
+    for (auto it: schema->parent()->schemas())
+        if (it.second == schema)
+            return pathConcat(getPath(schema->parent()), it.first);
+
+    throw sws::internal_error("Schema not in its parent schemas");
+}
+
+std::string swsEngine::getPath(swsModule *module)
+{
+    for (auto it: module->getSchema()->modules())
+        if (it.second == module)
+            return pathConcat(getPath(module->getSchema()), it.first);
+
+    throw sws::internal_error("Module not in its schema modules");
+}
+
+std::string swsEngine::getPath(swsPlug *plug)
+{
+    for (auto it: plug->getModule()->plugs())
+        if (it.second == plug)
+            return getPath(plug->getModule()) + attributeDelimiter + it.first;
+
+    throw sws::internal_error("Plug not in its module plug list");
+}
+
 void swsEngine::newModule(std::string modulePath, std::string moduleType)
 {
     getSchema(getBasePath(modulePath))->newModule(getItemName(modulePath), moduleType);
@@ -138,10 +182,11 @@ bool swsEngine::canConnect(std::string plugPath1, std::string plugPath2)
 
 std::unordered_set<std::string> swsEngine::listConnectable(std::string plugPath)
 {
-    // TODO
+    std::unordered_set<swsPlug *> plugs = getPlug(plugPath)->listConnectable();
     std::unordered_set<std::string> list;
-    std::string schemaPath = getBasePath(plugPath);
-    swsPlug *plug = getPlug(plugPath);
+    for (swsPlug *plug: plugs)
+        list.insert(getPath(plug));
+    return list;
 }
 
 void swsEngine::disconnect(std::string plugPath1, std::string plugPath2)

@@ -15,6 +15,13 @@ namespace sws {
         exception(std::string msg): mMsg(msg) {}
     };
 
+    class internal_error: public exception
+    {
+    public:
+        internal_error(std::string msg): exception(msg) {}
+
+    };
+
     class unknown_object: public exception
     {
     public:

@@ -28,8 +28,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 class swsSchema
 {
 public:
-    swsSchema();
+    swsSchema(swsSchema *parent);
     virtual ~swsSchema();
+
+    swsSchema *parent() { return mParent; }
 
     swsSchema *getSchema(std::string schemaName);
 
@@ -40,10 +42,14 @@ public:
     void expireSchedule() { mScheduled = false; }
     void step();
 
-protected:
-    std::unordered_map<std::string, swsSchema *> mSchemas;
+    std::unordered_map<std::string, swsModule *> const& modules() const { return mModules; }
+    std::unordered_map<std::string, swsSchema *> const& schemas() const { return mSchemas; }
 
+protected:
+    swsSchema *mParent;
+    std::unordered_map<std::string, swsSchema *> mSchemas;
     std::unordered_map<std::string, swsModule *> mModules;
+
     std::vector<swsModule *> mScheduledModules;
     bool mScheduled;
 

@@ -69,12 +69,21 @@ swsPlug *swsModule::plug(std::string name) const
     }
 }
 
-std::unordered_set<std::string> swsModule::listPlugs()
+void swsModule::listAddConnected(swsPlug::direction direction, std::unordered_set<swsModule *> &list)
 {
-    std::unordered_set<std::string> plugs;
+    if (list.find(this) != list.end())
+        return;
 
-    for (auto it: mPlugs)
-        plugs.insert(it.first);
+    if (isInterconnected()) {
+        list.insert(this);
+        for (auto it: mPlugs) {
+            if (it.second->getDirection() != direction)
+                continue;
+            if (it.second->connectedFrom())
+                it.second->connectedFrom()->getModule()->listAddConnected(direction, list);
+            for (auto connected: it.second->connectedTo())
+                connected->getModule()->listAddConnected(direction, list);
+        }
+    }
 
-    return plugs;
 }

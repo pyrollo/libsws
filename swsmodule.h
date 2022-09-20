@@ -43,15 +43,15 @@ public:
 
     swsSchema *getSchema() { return mSchema; }
 
-    std::unordered_set<std::string> listPlugs();
-
     swsPlug *plug(std::string plugName) const;
-    std::map<std::string, swsPlug *> const plugs() { return mPlugs; }
+    std::unordered_map<std::string, swsPlug *> const& plugs() const { return mPlugs; }
 
     virtual swsSchema* toSchema() { return nullptr; }
 
+    void listAddConnected(swsPlug::direction direction, std::unordered_set<swsModule *> &list);
+
 protected:
-    std::map<std::string, swsPlug *> mPlugs;
+    std::unordered_map<std::string, swsPlug *> mPlugs;
     swsSchema *mSchema;
 
     swsPlug *newPlug(std::string name, swsPlug::direction direction, swsValue value);

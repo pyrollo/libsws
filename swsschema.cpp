@@ -23,7 +23,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "swsexception.h"
 
 
-swsSchema::swsSchema(): mScheduled(false)
+swsSchema::swsSchema(swsSchema *parent): mParent(parent), mScheduled(false)
 {
 }
 

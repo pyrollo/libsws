@@ -31,8 +31,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 class swsEngine
 {
 public:
+
     const char pathDelimiter = '/';
     const char attributeDelimiter = '#';
+
+    swsEngine(): mRootSchema(nullptr) {}
 
     void newModule(std::string modulePath, std::string moduleType);
     void copyModule(std::string sourcePath, std::string targetPath);
@@ -55,13 +58,20 @@ private:
     swsSchema mRootSchema;
 
     void checkName(std::string name);
+
     std::vector<std::string> splitPath(std::string path);
     std::string getBasePath(std::string path);
     std::string getItemName(std::string path);
     std::string getItemAttributeName(std::string path);
+
     swsSchema *getSchema(std::string schemaPath);
     swsModule *getModule(std::string modulePath);
     swsPlug   *getPlug(std::string plugPath);
+
+    std::string pathConcat(std::string first, std::string last);
+    std::string getPath(swsSchema *schema);
+    std::string getPath(swsModule *module);
+    std::string getPath(swsPlug   *plug);
 };
 
 #endif // SWS_H

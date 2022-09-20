@@ -18,7 +18,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include "swsplug.h"
 #include "swsexception.h"
+#include "swsschema.h"
 #include "swsmodule.h"
+#include "swsplug.h"
 
 swsPlug::~swsPlug()
 {
@@ -145,3 +147,33 @@ void swsPlug::disconnect(swsPlug *plug)
     }
 }
 
+std::unordered_set<swsPlug *> swsPlug::listConnectable()
+{
+    std::unordered_set<swsPlug *> list;
+    std::unordered_set<swsModule *> unconnectable;
+
+    switch (mDirection) {
+    case direction::none:
+        break;
+    case direction::input:
+        if (mConnectedFrom)
+            break;
+        mModule->listAddConnected(swsPlug::direction::output, unconnectable);
+        for (auto itModule: mModule->getSchema()->modules())
+            if (unconnectable.find(itModule.second) == unconnectable.end())
+                for (auto itPlug: itModule.second->plugs())
+                    if (itPlug.second->mDirection == direction::output)
+                        list.insert(itPlug.second);
+        break;
+    case direction::output:
+        mModule->listAddConnected(swsPlug::direction::input, unconnectable);
+        for (auto itModule: mModule->getSchema()->modules())
+            if (unconnectable.find(itModule.second) == unconnectable.end())
+                for (auto itPlug: itModule.second->plugs())
+                    if (itPlug.second->mDirection == direction::input &&
+                           !itPlug.second->mConnectedFrom)
+                        list.insert(itPlug.second);
+        break;
+    }
+    return list;
+}
