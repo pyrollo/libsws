@@ -27,7 +27,7 @@ public:
         friend T;
 
         static bool registerT() {
-            const auto typeName = T::getType();
+            const auto typeName = T::getTypeStatic();
             auto it = instanciators().find(typeName);
             if (it != instanciators().end())
                 throw sws::duplicate_name();

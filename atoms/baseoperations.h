@@ -26,14 +26,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 class swsModuleValue: public swsModule::Registrar<swsModuleValue>
 {
 public:
+    SWSMODULE("value");
+
     swsModuleValue(swsSchema *schema): swsModule::Registrar<swsModuleValue>(schema)
     {
         newPlug("value", swsPlug::direction::output, 0);
     }
 
     virtual ~swsModuleValue() {}
-
-    static std::string getType() { return "value"; }
 
     void step() override
     {}
@@ -42,6 +42,8 @@ public:
 class swsModuleAdd : public swsModule::Registrar<swsModuleAdd>
 {
 public:
+    SWSMODULE("add");
+
     swsModuleAdd(swsSchema *schema): swsModule::Registrar<swsModuleAdd>(schema)
     {
         mResult = newPlug("result", swsPlug::direction::output, 0);
@@ -50,8 +52,6 @@ public:
     }
 
     virtual ~swsModuleAdd() {}
-
-    static std::string getType() { return "add"; }
 
     void step() override
     {
@@ -65,6 +65,8 @@ private:
 class swsModuleMultiply : public swsModule::Registrar<swsModuleMultiply>
 {
 public:
+    SWSMODULE("multiply");
+
     swsModuleMultiply(swsSchema *schema): swsModule::Registrar<swsModuleMultiply>(schema)
     {
         mResult = newPlug("result", swsPlug::direction::output, 0);
@@ -73,8 +75,6 @@ public:
     }
 
     virtual ~swsModuleMultiply() {}
-
-    static std::string getType() { return "multiply"; }
 
     void step() override
     {

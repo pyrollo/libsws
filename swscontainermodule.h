@@ -28,10 +28,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 class swsContainerModule: public swsModule::Registrar<swsContainerModule>, public swsSchema
 {
 public:
+    SWSMODULE("container")
+
     swsContainerModule(swsSchema *schema): swsModule::Registrar<swsContainerModule>(schema), swsSchema(schema) {}
     virtual ~swsContainerModule() {}
-
-    static std::string getType() { return "container"; }
 
     void step() override;
 
@@ -45,10 +45,10 @@ class swsInputModule: public swsModule::Registrar<swsInputModule>
     friend class swsContainerModule;
 
 public:
+    SWSMODULE("input");
+
     swsInputModule(swsSchema *schema);
     ~swsInputModule() override;
-
-    static std::string getType() { return "input"; }
 
     void step() override;
 
@@ -61,10 +61,10 @@ class swsOutputModule: public swsModule::Registrar<swsOutputModule>
     friend class swsContainerModule;
 
 public:
+    SWSMODULE("output");
+
     swsOutputModule(swsSchema *schema);
     virtual ~swsOutputModule();
-
-    static std::string getType() { return "output"; }
 
     void step() override;
 

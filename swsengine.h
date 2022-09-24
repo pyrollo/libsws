@@ -38,7 +38,7 @@ public:
     swsEngine(): mRootSchema(nullptr) {}
 
     void newModule(std::string modulePath, std::string moduleType);
-    void copyModule(std::string sourcePath, std::string targetPath);
+    void instantiateModule(std::string modulePath, std::string templatePath);
     void deleteModule(std::string modulePath);
 
     void newPlug(std::string plugPath, std::string plugType);

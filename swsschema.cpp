@@ -53,6 +53,62 @@ swsModule *swsSchema::newModule(std::string moduleName, std::string moduleType)
     return module;
 }
 
+bool swsSchema::isDescendantOf(swsSchema *schema)
+{
+    if (schema == this)
+        return true;
+
+    if (mParent)
+        return mParent->isDescendantOf(schema);
+
+    return false;
+}
+
+swsModule *swsSchema::instantiateModule(std::string moduleName, swsModule *templateModule)
+{
+    swsSchema *templateSchema = templateModule->toSchema();
+
+    // Cannot instanciate a module inside itself (inside itself (inside itself ...))
+    if (templateSchema && isDescendantOf(templateSchema))
+        throw sws::illegal_operation();
+
+    swsModule *module = newModule(moduleName, templateModule->getType());
+
+    // Basic module
+    if (!templateSchema)
+    {
+        // Copy internal vars
+        for (auto it: templateModule->plugs())
+            module->plug(it.first)->setValue(it.second->getValue());
+
+        return module;
+    }
+
+    // Complex module
+    if (!module->toSchema())
+        throw sws::internal_error("Module type " + templateModule->getType() + " is suposed to be complex but it's not");
+
+    std::unordered_map<swsPlug *, swsPlug *> plugMap;
+
+    for (auto itModule: templateSchema->modules()) {
+        swsModule *newModule = module->toSchema()->instantiateModule(itModule.first, itModule.second);
+        for (auto itPlug: itModule.second->plugs())
+            plugMap[itPlug.second] = newModule->plug(itPlug.first);
+    }
+
+    // Copy internal vars (must be done after submodules instanciation)
+    for (auto it: templateModule->plugs())
+        module->plug(it.first)->setValue(it.second->getValue());
+
+    // Connectics
+    for (auto itModule: templateSchema->modules())
+        for (auto itPlug: itModule.second->plugs())
+            if (itPlug.second->connectedFrom())
+                plugMap[itPlug.second]->connect(plugMap[itPlug.second->connectedFrom()]);
+
+    return module;
+}
+
 swsSchema *swsSchema::getSchema(std::string schemaName)
 {
     try {

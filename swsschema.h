@@ -37,6 +37,8 @@ public:
 
     swsModule *getModule(std::string moduleName);
     virtual swsModule *newModule(std::string moduleName, std::string moduleType);
+    swsModule *instantiateModule(std::string moduleName, swsModule *templateModule);
+
     void deleteModule(std::string moduleName);
 
     void expireSchedule() { mScheduled = false; }
@@ -56,7 +58,7 @@ protected:
     bool isQueuable(swsModule *module, std::unordered_set<swsModule *> &unscheduledModules);
     void schedule();
 
-    bool isAncestorOf(swsSchema *schema);
+    bool isDescendantOf(swsSchema *schema);
 };
 
 #endif // SWSSCHEMA_H

@@ -159,7 +159,11 @@ void swsEngine::newModule(std::string modulePath, std::string moduleType)
     getSchema(getBasePath(modulePath))->newModule(getItemName(modulePath), moduleType);
 }
 
-//void swsEngine::copyModule(std::string sourcePath, std::string targetPath);
+void swsEngine::instantiateModule(std::string modulePath, std::string templatePath)
+{
+    getSchema(getBasePath(modulePath))->instantiateModule(getItemName(modulePath), getModule(templatePath));
+}
+
 
 void swsEngine::deleteModule(std::string modulePath)
 {

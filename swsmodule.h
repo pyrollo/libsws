@@ -31,14 +31,22 @@ class swsInputModule;
 
 typedef swsFactory<swsModule> swsModuleFactory;
 
+#define SWSMODULE(typeName) \
+    static std::string getTypeStatic() { return typeName; } \
+    virtual std::string getType() override { return getTypeStatic(); }
+
 class swsModule: public swsModuleFactory
 {
 public:
     swsModule(swsSchema *schema);
     virtual ~swsModule();
 
+
+    static std::string getTypeStatic() { return "unknown"; }
+    virtual std::string getType() = 0;
+
     virtual void step() = 0;
-    static std::string getType() { return "unknown"; }
+
     virtual bool isInterconnected() { return true; }
 
     swsSchema *getSchema() { return mSchema; }
