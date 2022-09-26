@@ -24,6 +24,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include "swscontainermodule.h"
 
+// Private stuff
+// -------------
+
 void swsEngine::checkName(std::string name)
 {
     if (name.find_first_not_of("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-") != std::string::npos)
@@ -110,7 +113,7 @@ swsPlug *swsEngine::getPlug(std::string plugPath)
 }
 
 
-std::string swsEngine::pathConcat(std::string first, std::string last)
+std::string swsEngine::pathJoin(std::string first, std::string last)
 {
     if (last.empty())
         return first;
@@ -131,7 +134,7 @@ std::string swsEngine::getPath(swsSchema *schema)
 
     for (auto it: schema->parent()->schemas())
         if (it.second == schema)
-            return pathConcat(getPath(schema->parent()), it.first);
+            return pathJoin(getPath(schema->parent()), it.first);
 
     throw sws::internal_error("Schema not in its parent schemas");
 }
@@ -140,7 +143,7 @@ std::string swsEngine::getPath(swsModule *module)
 {
     for (auto it: module->getSchema()->modules())
         if (it.second == module)
-            return pathConcat(getPath(module->getSchema()), it.first);
+            return pathJoin(getPath(module->getSchema()), it.first);
 
     throw sws::internal_error("Module not in its schema modules");
 }
@@ -153,6 +156,9 @@ std::string swsEngine::getPath(swsPlug *plug)
 
     throw sws::internal_error("Plug not in its module plug list");
 }
+
+// Schema construction
+// -------------------
 
 void swsEngine::newModule(std::string modulePath, std::string moduleType)
 {
@@ -177,6 +183,68 @@ void swsEngine::connect(std::string plugPath1, std::string plugPath2)
     plug1->connect(plug2);
 }
 
+void swsEngine::disconnect(std::string plugPath1, std::string plugPath2)
+{
+    swsPlug *plug1 = getPlug(plugPath1);
+    swsPlug *plug2 = getPlug(plugPath2);
+    plug1->disconnect(plug2);
+}
+
+// Access to values
+// ----------------
+
+void swsEngine::set(std::string plugPath, swsValue value)
+{
+    getPlug(plugPath)->setValue(value);
+}
+
+swsValue swsEngine::get(std::string plugPath)
+{
+    return getPlug(plugPath)->getValue();
+}
+
+// Execution
+// ---------
+
+void swsEngine::step()
+{
+    mRootSchema.step();
+}
+
+// Introspection
+// -------------
+
+std::unordered_set<std::string> swsEngine::listPlugs(std::string modulePath)
+{
+    std::unordered_set<std::string> result;
+
+    swsModule *module = getModule(modulePath);
+    for (auto it: module->plugs())
+        result.insert(modulePath + attributeDelimiter + it.first);
+    return result;
+}
+
+std::string swsEngine::getModuleType(std::string modulePath)
+{
+    return getModule(modulePath)->getType();
+}
+
+std::string swsEngine::getPlugType(std::string plugPath)
+{
+    switch(getPlug(plugPath)->getDirection()) {
+    case swsPlug::direction::input:
+        return "input";
+        break;
+    case swsPlug::direction::output:
+        return "output";
+        break;
+    case swsPlug::direction::none:
+        return "internal";
+        break;
+    }
+    return "unknown";
+}
+
 bool swsEngine::canConnect(std::string plugPath1, std::string plugPath2)
 {
     swsPlug *plug1 = getPlug(plugPath1);
@@ -191,27 +259,4 @@ std::unordered_set<std::string> swsEngine::listConnectable(std::string plugPath)
     for (swsPlug *plug: plugs)
         list.insert(getPath(plug));
     return list;
-}
-
-void swsEngine::disconnect(std::string plugPath1, std::string plugPath2)
-{
-    swsPlug *plug1 = getPlug(plugPath1);
-    swsPlug *plug2 = getPlug(plugPath2);
-    plug1->disconnect(plug2);
-}
-
-
-void swsEngine::set(std::string plugPath, swsValue value)
-{
-    getPlug(plugPath)->setValue(value);
-}
-
-swsValue swsEngine::get(std::string plugPath)
-{
-    return getPlug(plugPath)->getValue();
-}
-
-void swsEngine::step()
-{
-    mRootSchema.step();
 }

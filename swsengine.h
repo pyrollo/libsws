@@ -31,28 +31,38 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 class swsEngine
 {
 public:
-
     const char pathDelimiter = '/';
     const char attributeDelimiter = '#';
 
     swsEngine(): mRootSchema(nullptr) {}
 
+    // Schema construction
+
     void newModule(std::string modulePath, std::string moduleType);
     void instantiateModule(std::string modulePath, std::string templatePath);
     void deleteModule(std::string modulePath);
 
-    void newPlug(std::string plugPath, std::string plugType);
-    void deletePlug(std::string plugPath);
-
     void connect(std::string plugPath1, std::string plugPath2);
-    bool canConnect(std::string plugPath1, std::string plugPath2);
-    std::unordered_set<std::string> listConnectable(std::string plugPath);
     void disconnect(std::string plugPath1, std::string plugPath2);
+
+    // Access to values
 
     void set(std::string plugPath, swsValue value);
     swsValue get(std::string plugPath);
 
+    // Execution
+
     void step();
+
+    // Introspection
+
+    std::unordered_set<std::string> listPlugs(std::string modulePath);
+
+    std::string getModuleType(std::string modulePath);
+    std::string getPlugType(std::string plugPath);
+
+    bool canConnect(std::string plugPath1, std::string plugPath2);
+    std::unordered_set<std::string> listConnectable(std::string plugPath);
 
 private:
     swsSchema mRootSchema;
@@ -68,7 +78,7 @@ private:
     swsModule *getModule(std::string modulePath);
     swsPlug   *getPlug(std::string plugPath);
 
-    std::string pathConcat(std::string first, std::string last);
+    std::string pathJoin(std::string first, std::string last);
     std::string getPath(swsSchema *schema);
     std::string getPath(swsModule *module);
     std::string getPath(swsPlug   *plug);
